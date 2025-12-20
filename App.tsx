@@ -62,7 +62,7 @@ const App: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt: inputText, 
-          tone: selectedTone.labelKey, 
+          tone: selectedTone.systemPrompt, 
           language: targetLang,
           platform: platform
         }),
