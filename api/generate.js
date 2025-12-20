@@ -1,37 +1,48 @@
+// api/generate.js
 import Groq from "groq-sdk";
 
 export default async function handler(req, res) {
-  // Only allow POST requests
+  // 1. CORS Headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { prompt } = req.body;
-
-  if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required' });
-  }
-
   try {
-    // Initialize Groq with the secure API key from environment variables
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error("GROQ_API_KEY is missing in Vercel Settings");
+    }
+
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-    // Create a streaming chat completion using Llama 3
+    // Handle the specific prompt structure sent by your React App
+    const { prompt } = req.body;
+
+    if (!prompt) {
+       return res.status(400).json({ error: "No prompt provided" });
+    }
+
+    // Streaming Response
     const stream = await groq.chat.completions.create({
-      messages: [
-        { role: "user", content: prompt }
-      ],
-      model: "llama3-70b-8192", // High performance Llama 3 model
+      messages: [{ role: "user", content: prompt }],
+      model: "llama3-70b-8192",
       stream: true,
       temperature: 0.7,
       max_tokens: 1024,
     });
 
-    // Set headers for streaming response
+    // Set headers for streaming
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Transfer-Encoding', 'chunked');
 
-    // Stream the chunks back to the client
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content || "";
       if (content) {
@@ -42,8 +53,7 @@ export default async function handler(req, res) {
     res.end();
 
   } catch (error) {
-    console.error("Groq API Error:", error);
-    res.status(500).write("Error generating content.");
-    res.end();
+    console.error("Backend Error:", error);
+    res.status(500).json({ error: error.message });
   }
 }
