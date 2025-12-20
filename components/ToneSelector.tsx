@@ -1,51 +1,58 @@
+// components/ToneSelector.tsx
 import React from 'react';
-import { ToneOption, Translations } from '../types';
-import { TONE_OPTIONS } from '../constants';
-import * as Icons from 'lucide-react';
 import { motion } from 'framer-motion';
+import * as Icons from 'lucide-react';
+import { TONE_OPTIONS } from '../constants';
 
-interface ToneSelectorProps {
-  selectedToneId: string;
-  onSelect: (tone: ToneOption) => void;
+interface Props {
+  selectedTone: any;
+  setSelectedTone: (t: any) => void;
   disabled: boolean;
-  t: Translations['en'];
 }
 
-const ToneSelector: React.FC<ToneSelectorProps> = ({ selectedToneId, onSelect, disabled, t }) => {
+const ToneSelector: React.FC<Props> = ({ selectedTone, setSelectedTone, disabled }) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-        {t.selectTone}
-      </h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex md:grid md:grid-cols-4 lg:grid-cols-6 gap-2 min-w-max md:min-w-0 p-1">
         {TONE_OPTIONS.map((tone) => {
-          // Dynamic Icon Component
+          // Dynamic Icon loading
           // @ts-ignore
-          const IconComponent = Icons[tone.iconName] || Icons.HelpCircle;
-          const isSelected = selectedToneId === tone.id;
+          const Icon = Icons[tone.iconName] || Icons.Sparkles;
+          const isSelected = selectedTone.id === tone.id;
 
           return (
             <motion.button
               key={tone.id}
-              onClick={() => onSelect(tone)}
+              onClick={() => setSelectedTone(tone)}
               disabled={disabled}
-              whileHover={{ scale: disabled ? 1 : 1.02 }}
-              whileTap={{ scale: disabled ? 1 : 0.98 }}
+              whileTap={{ scale: 0.95 }}
               className={`
-                relative flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200 h-28
+                relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 border
                 ${isSelected 
-                  ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 ring-1 ring-brand-500' 
-                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:border-brand-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                  ? 'bg-indigo-50 dark:bg-indigo-500/20 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-sm' 
+                  : 'bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                 }
-                ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
-              <div className={`mb-2 p-2 rounded-full ${isSelected ? 'bg-brand-100 dark:bg-brand-800 text-brand-600 dark:text-brand-200' : 'bg-slate-100 dark:bg-slate-700'}`}>
-                <IconComponent size={20} />
+              <div className={`
+                p-2 rounded-lg shrink-0
+                ${isSelected ? 'bg-indigo-100 dark:bg-indigo-500/30' : 'bg-slate-100 dark:bg-slate-800'}
+              `}>
+                <Icon size={18} />
               </div>
-              <span className="text-xs font-semibold text-center leading-tight">
-                {t.tones[tone.labelKey] || tone.id}
-              </span>
+              <div className="text-left">
+                <div className="text-sm font-semibold">{tone.labelKey}</div>
+                {/* Optional: Add a tiny description if you want */}
+              </div>
+              
+              {isSelected && (
+                <motion.div 
+                  layoutId="active-ring"
+                  className="absolute inset-0 border-2 border-indigo-500 rounded-xl"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
             </motion.button>
           );
         })}
