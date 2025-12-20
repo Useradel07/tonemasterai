@@ -9,42 +9,41 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // 2. Safety Wrap - CATCH ALL ERRORS
   try {
-    // Check if Key exists
     if (!process.env.GROQ_API_KEY) {
-      throw new Error("CRITICAL: GROQ_API_KEY is missing from process.env");
+      throw new Error("GROQ_API_KEY is missing");
     }
 
-    // Try to initialize Groq
-    let groq;
-    try {
-      groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    } catch (err) {
-      throw new Error(`Failed to initialize Groq SDK: ${err.message}`);
-    }
-
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const { prompt } = req.body;
-    if (!prompt) throw new Error("No 'prompt' found in request body.");
 
-    // 3. Simple Request (No Streaming for Debugging)
-    const completion = await groq.chat.completions.create({
+    if (!prompt) throw new Error("No prompt provided");
+
+    // 2. USE THE NEW MODEL
+    const stream = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "llama3-70b-8192",
+      // ✅ UPDATED MODEL NAME:
+      model: "llama-3.3-70b-versatile", 
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 1024,
     });
 
-    const result = completion.choices[0]?.message?.content || "No content returned";
-    
-    // Success
-    return res.status(200).json({ result: result });
+    // 3. Stream back to frontend
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) {
+        res.write(content);
+      }
+    }
+
+    res.end();
 
   } catch (error) {
-    console.error("DEBUG ERROR:", error);
-    // 4. RETURN THE ERROR TO THE FRONTEND
-    // Instead of 500, we send 200 with the error details so you can read it.
-    return res.status(200).json({ 
-      result: `⚠️ SYSTEM ERROR: ${error.message}`,
-      isError: true 
-    });
+    console.error("Backend Error:", error);
+    res.status(500).json({ error: error.message });
   }
 }
