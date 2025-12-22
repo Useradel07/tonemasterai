@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 import AdUnit from './components/AdUnit'; // Add this
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 // --- IMPORTS ---
 // Assuming you have these components/constants in your project structure
