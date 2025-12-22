@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { History, X, Clock, ArrowRight } from 'lucide-react';
 import { HistoryItem, Translations } from '../types';
+import AdUnit from './AdUnit'; // Adjust path if necessary
 
 interface HistorySidebarProps {
   isOpen: boolean;
@@ -102,6 +103,11 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                     </motion.div>
                   ))
                 )}
+                {/* --- AD PLACEMENT 3: SIDEBAR --- */}
+                {history.length > 2 && (
+                    <AdUnit slotId="0987654321" format="vertical" /> {/* REPLACE WITH SLOT ID 2 */}
+                )}
+                {/* ------------------------------- */}
               </div>
 
               {/* Footer */}
@@ -122,5 +128,6 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
     </AnimatePresence>
   );
 };
+
 
 export default HistorySidebar;

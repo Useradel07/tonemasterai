@@ -6,6 +6,9 @@ import {
   Menu, X, MessageSquare, Mic
 } from 'lucide-react';
 
+import AdUnit from './components/AdUnit'; // Add this
+import { Analytics } from "@vercel/analytics/next";
+
 // --- IMPORTS ---
 // Assuming you have these components/constants in your project structure
 import ToneSelector from './components/ToneSelector';
@@ -301,6 +304,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Content Area */}
+            {/* Content Area */}
             <div className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
               {result ? (
                 <div className="prose prose-slate dark:prose-invert max-w-none leading-relaxed text-base md:text-lg whitespace-pre-wrap">
@@ -308,6 +312,15 @@ const App: React.FC = () => {
                   {isStreaming && (
                     <span className="inline-block w-2 h-5 ml-1 align-middle bg-indigo-500 animate-pulse rounded-sm"/>
                   )}
+                  
+                  {/* --- AD PLACEMENT 1: HIGH REVENUE --- */}
+                  {!isStreaming && (
+                     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <AdUnit slotId="1234567890" /> {/* REPLACE WITH SLOT ID 1 */}
+                     </div>
+                  )}
+                  {/* ------------------------------------ */}
+
                 </div>
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 px-6 text-center">
@@ -315,6 +328,13 @@ const App: React.FC = () => {
                     <Sparkles size={32} className="text-slate-300 dark:text-slate-700" />
                   </div>
                   <p className="text-sm font-medium">Select a tone and rewrite your text.</p>
+                  
+                  {/* --- AD PLACEMENT 2: EMPTY STATE --- */}
+                  <div className="mt-10 w-full max-w-xs opacity-80">
+                      <AdUnit slotId="1234567890" format="rectangle" style={{minHeight: '250px'}}/> {/* REPLACE WITH SLOT ID 1 */}
+                  </div>
+                  {/* ----------------------------------- */}
+                  
                 </div>
               )}
             </div>
@@ -333,6 +353,8 @@ const App: React.FC = () => {
         t={{ historyTitle: "History", noHistory: "No history yet", clearHistory: "Clear All" } as any}
         isRTL={false}
       />
+      {/* 👇 2. Add the Analytics component here at the bottom */}
+      <Analytics />
     </div>
   );
 };
