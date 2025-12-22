@@ -4,6 +4,7 @@ import { History, X, Clock, ArrowRight } from 'lucide-react';
 import { HistoryItem, Translations } from '../types';
 import AdUnit from './AdUnit'; // Adjust path if necessary
 
+
 interface HistorySidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -103,11 +104,11 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                     </motion.div>
                   ))
                 )}
-                {/* --- AD PLACEMENT 3: SIDEBAR --- */}
+                /* --- AD PLACEMENT 3: SIDEBAR --- */
                 {history.length > 2 && (
-                    <AdUnit slotId="0987654321" format="vertical" /> {/* REPLACE WITH SLOT ID 2 */}
+                  <AdUnit slotId="0987654321" format="vertical" /> 
                 )}
-                {/* ------------------------------- */}
+                
               </div>
 
               {/* Footer */}
